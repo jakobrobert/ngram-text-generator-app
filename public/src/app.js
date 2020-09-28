@@ -27,7 +27,7 @@ function runApp() {
 function tokenize(text) {
     // split text into tokens
     // regex: \s => whitespace (including tab, newline), + => one or more
-    return trainingText.split(/\s+/);
+    return text.split(/\s+/);
 }
 
 function buildModelFromTokens(tokens) {
