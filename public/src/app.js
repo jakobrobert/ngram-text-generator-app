@@ -15,13 +15,32 @@ const trainingText = "n-gram models are widely used in statistical natural langu
     "Handcrafted features of various sorts are also used, for example variables that represent the position of a word in a sentence or the general topic of discourse. In addition, features based on the structure of the potential result, such as syntactic considerations, are often used. Such features are also used as part of the likelihood function, which makes use of the observed data. Conventional linguistic theory can be incorporated in these features (although in practice, it is rare that features specific to generative or other particular theories of grammar are incorporated, as computational linguists tend to be \"agnostic\" towards individual theories of grammar[citation needed]). ";
 
 const order = 3;
+let model;
 
-function runApp() {
-    const tokens = tokenize(trainingText);
-    const ngrams = buildModelFromTokens(tokens);
-    const generatedTokens = generateTokensFromModel(ngrams, ["In", "practice,"], 100);
+function buildModel() {
+    const files = document.getElementById("training-text-file").files;
+    if (files.length === 0) {
+        alert("You need to choose a text file!");
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+        const text = reader.result;
+        const tokens = tokenize(text);
+        model = buildModelFromTokens(tokens);
+        console.log(model);
+    }
+    reader.readAsText(files[0]);
+}
+
+function generateText() {
+    if (!model) {
+        alert("You need to build the model first!");
+        return;
+    }
+    const generatedTokens = generateTokensFromModel(model, ["All", "I"], 100);
     const generatedText = generatedTokens.join(" ");
-    console.log(generatedText);
+    document.getElementById("generated-text").innerText = generatedText;
 }
 
 function tokenize(text) {
