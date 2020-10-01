@@ -22,7 +22,20 @@ function generateText() {
         alert("You need to build the model first!");
         return;
     }
-    const generatedTokens = model.generateTokens(["Yes", "I"], 100);
+
+    const startText = document.getElementById("start-text").value;
+    const startHistory = tokenize(startText);
+    if (startHistory.length !== 2) {
+        alert("You need to specify a start text of exactly 2 words!");
+        return;
+    }
+
+    const length = document.getElementById("text-length").value;
+    if (!length) {
+        alert("Please specify a valid number for the text length!");
+        return;
+    }
+    const generatedTokens = model.generateTokens(startHistory, length);
     const generatedText = generatedTokens.join(" ");
     document.getElementById("generated-text").innerText = generatedText;
 }
