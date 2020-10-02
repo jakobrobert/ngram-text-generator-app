@@ -15,19 +15,19 @@ class NGramModel {
             }
             const prediction = tokens[i + this.order - 1];
 
-            // find corresponding ngram for current history
+            // find corresponding ngram for current history, create if it does not exist
             const ngramIndex = this.findNGramByHistory(history);
             if (ngramIndex === -1) {
-                // if ngram does not exist, create new ngram
-                const ngram = {
-                    history: history,
-                    predictions: [prediction]
-                };
+                const ngram = new NGram(history, prediction);
                 this.ngrams.push(ngram);
             } else {
-                // if ngram already exists, add prediction
-                this.ngrams[ngramIndex].predictions.push(prediction);
+                const ngram = this.ngrams[ngramIndex];
+                ngram.addPrediction(prediction);
             }
+        }
+
+        for (const ngram of this.ngrams) {
+            ngram.calculateProbabilities();
         }
     }
 
@@ -41,16 +41,14 @@ class NGramModel {
             const ngramIndex = this.findNGramByHistory(currHistory);
             if (ngramIndex === -1) {
                 // ngram with current history not found
-                // may occur if current history appeared at the end of the training text
+                // may occur if current history only appeared at the end of the training text
                 // or if start history did not appear at all
                 return tokens;
             }
             const ngram = this.ngrams[ngramIndex];
 
-            // pick random prediction and add it to the tokens
-            const predictions = ngram.predictions;
-            const predictionIndex = Math.floor(Math.random() * predictions.length);
-            const prediction = predictions[predictionIndex];
+            // add random prediction to tokens
+            const prediction = ngram.getRandomPrediction();
             tokens.push(prediction);
 
             // update history -> use last (order - 1) tokens
@@ -61,23 +59,11 @@ class NGramModel {
     }
 
     findNGramByHistory(history) {
-        for (let j = 0; j < this.ngrams.length; j++) {
-            if (this.arraysEqual(this.ngrams[j].history, history)) {
-                return j;
+        for (let i = 0; i < this.ngrams.length; i++) {
+            if (this.ngrams[i].matchesHistory(history)) {
+                return i;
             }
         }
         return -1;
-    }
-
-    arraysEqual(arr1, arr2) {
-        if (arr1.length !== arr2.length) {
-            return false;
-        }
-        for (let i = 0; i < arr1.length; i++) {
-            if (arr1[i] !== arr2[i]) {
-                return false;
-            }
-        }
-        return true;
     }
 }

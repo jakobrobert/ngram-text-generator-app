@@ -11,8 +11,12 @@ function buildModel() {
     reader.onload = () => {
         const text = reader.result;
         const tokens = tokenize(text);
+        console.log("Training text tokens length: " + tokens.length);
         model = new NGramModel(ORDER);
+        const startTime = performance.now();
         model.buildModelFromTokens(tokens);
+        const elapsedTime = performance.now() - startTime;
+        console.log("Required " + elapsedTime + " ms to build model.");
     }
     reader.readAsText(files[0]);
 }
@@ -35,7 +39,12 @@ function generateText() {
         alert("Please specify a valid number for the text length!");
         return;
     }
+
+    const startTime = performance.now();
     const generatedTokens = model.generateTokens(startHistory, length);
+    const elapsedTime = performance.now() - startTime;
+    console.log("Required " + elapsedTime + " ms to generate tokens.");
+    console.log("Generated tokens length: " + generatedTokens.length);
     const generatedText = generatedTokens.join(" ");
     document.getElementById("generated-text").innerText = generatedText;
 }
