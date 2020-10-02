@@ -8,12 +8,12 @@ class NGramModel {
         this.ngrams = [];
 
         for (let i = 0; i < tokens.length - (this.order - 1); i++) {
-            // get current ngram and split into history and follower
+            // get current ngram and split into history and prediction
             const history = [];
             for (let j = 0; j < this.order - 1; j++) {
                 history.push(tokens[i + j]);
             }
-            const follower = tokens[i + this.order - 1];
+            const prediction = tokens[i + this.order - 1];
 
             // find corresponding ngram for current history
             const ngramIndex = this.findNGramByHistory(history);
@@ -21,12 +21,12 @@ class NGramModel {
                 // if ngram does not exist, create new ngram
                 const ngram = {
                     history: history,
-                    followers: [follower]
+                    predictions: [prediction]
                 };
                 this.ngrams.push(ngram);
             } else {
-                // if ngram already exists, add follower
-                this.ngrams[ngramIndex].followers.push(follower);
+                // if ngram already exists, add prediction
+                this.ngrams[ngramIndex].predictions.push(prediction);
             }
         }
     }
@@ -47,11 +47,11 @@ class NGramModel {
             }
             const ngram = this.ngrams[ngramIndex];
 
-            // pick random follower and add it to the tokens
-            const followers = ngram.followers;
-            const followerIndex = Math.floor(Math.random() * followers.length);
-            const follower = followers[followerIndex];
-            tokens.push(follower);
+            // pick random prediction and add it to the tokens
+            const predictions = ngram.predictions;
+            const predictionIndex = Math.floor(Math.random() * predictions.length);
+            const prediction = predictions[predictionIndex];
+            tokens.push(prediction);
 
             // update history -> use last (order - 1) tokens
             currHistory = tokens.slice(tokens.length - (this.order - 1), tokens.length);
