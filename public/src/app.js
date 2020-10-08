@@ -1,5 +1,10 @@
 const ORDER = 3;
+
+let dictionary;
 let model;
+
+let startTime;
+let elapsedTime;
 
 function buildModel() {
     const files = document.getElementById("training-text-file").files;
@@ -10,15 +15,40 @@ function buildModel() {
     const reader = new FileReader();
     reader.onload = () => {
         const text = reader.result;
-        const tokens = tokenize(text);
+        startTime = performance.now();
+        const tokens = preProcessText(text);
+        elapsedTime = performance.now() - startTime;
+        console.log("Pre-processing: " + elapsedTime + " ms");
         console.log("Training text tokens length: " + tokens.length);
         model = new NGramModel(ORDER);
-        const startTime = performance.now();
+        startTime = performance.now();
         model.buildModelFromTokens(tokens);
-        const elapsedTime = performance.now() - startTime;
-        console.log("Required " + elapsedTime + " ms to build model.");
+        elapsedTime = performance.now() - startTime;
+        console.log("Build model: " + elapsedTime + " ms");
     }
     reader.readAsText(files[0]);
+}
+
+function preProcessText(text) {
+    const tokens = tokenize(text);
+    dictionary = new Dictionary();
+    for (const token of tokens) {
+        dictionary.addToken(token);
+    }
+    return convertTokensToNumbers(tokens);
+}
+
+function tokenize(text) {
+    // regex: \s => whitespace (including tab, newline), + => one or more
+    return text.split(/\s+/);
+}
+
+function convertTokensToNumbers(tokens) {
+    const numbers = new Array(tokens.length);
+    for (let i = 0; i < numbers.length; i++) {
+        numbers[i] = dictionary.getIDOfToken(tokens[i]);
+    }
+    return numbers;
 }
 
 function generateText() {
@@ -40,17 +70,24 @@ function generateText() {
         return;
     }
 
-    const startTime = performance.now();
-    const generatedTokens = model.generateTokens(startHistory, length);
-    const elapsedTime = performance.now() - startTime;
-    console.log("Required " + elapsedTime + " ms to generate tokens.");
-    console.log("Generated tokens length: " + generatedTokens.length);
-    const generatedText = generatedTokens.join(" ");
-    document.getElementById("generated-text").innerText = generatedText;
+    const startHistoryAsNumbers = convertTokensToNumbers(startHistory);
+
+    startTime = performance.now();
+    const tokens = model.generateTokens(startHistoryAsNumbers, length);
+    elapsedTime = performance.now() - startTime;
+    console.log("Generate tokens: " + elapsedTime + " ms");
+    console.log("Generated tokens length: " + tokens.length);
+    startTime = performance.now();
+    const text = postProcessTokens(tokens);
+    elapsedTime = performance.now () - startTime;
+    console.log("Post-processing: " + elapsedTime + " ms");
+    document.getElementById("generated-text").innerText = text;
 }
 
-function tokenize(text) {
-    // split text into tokens
-    // regex: \s => whitespace (including tab, newline), + => one or more
-    return text.split(/\s+/);
+function postProcessTokens(tokensAsNumbers) {
+    const tokens = new Array(tokensAsNumbers.length);
+    for (let i = 0; i < tokens.length; i++) {
+        tokens[i] = dictionary.getTokenByID(tokensAsNumbers[i]);
+    }
+    return tokens.join(" ");
 }
