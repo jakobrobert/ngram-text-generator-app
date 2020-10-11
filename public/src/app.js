@@ -4,7 +4,7 @@ const ORDER = 3;
 const SPECIAL_CHARS_WITH_SEPARATION = ["(", "[", "{", "\""];
 
 // special chars which are directly concatenated to the previous token without any separation
-const SPECIAL_CHARS_WITHOUT_SEPARATION = [".", "?", "!", ",", ";", ":", ")", "]", "}", "\n", "\r"];
+const SPECIAL_CHARS_WITHOUT_SEPARATION = [".", "?", "!", ",", ";", ":", ")", "]", "}", "\n"];
 
 // all special chars, no distinction necessary for building the model
 const SPECIAL_CHARS = SPECIAL_CHARS_WITH_SEPARATION.concat(SPECIAL_CHARS_WITHOUT_SEPARATION)
@@ -39,12 +39,15 @@ function buildModel() {
 }
 
 function preProcessText(text) {
-    const tokens = tokenize(text);
-    dictionary = new Dictionary();
-    for (const token of tokens) {
-        dictionary.addToken(token);
-    }
+    const filteredText = filterText(text);
+    const tokens = tokenize(filteredText);
+    buildDictionary(tokens);
     return convertTokensFromStringToID(tokens);
+}
+
+function filterText(text) {
+    // remove all "\r" (carriage return)
+    return text.replace(/\r/g, "");
 }
 
 function tokenize(text) {
@@ -84,6 +87,13 @@ function tokenize(text) {
         tokens.push(token);
     }
     return tokens;
+}
+
+function buildDictionary(tokens) {
+    dictionary = new Dictionary();
+    for (const token of tokens) {
+        dictionary.addToken(token);
+    }
 }
 
 function convertTokensFromStringToID(tokens) {
