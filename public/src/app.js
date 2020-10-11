@@ -9,8 +9,9 @@ const SPECIAL_CHARS_WITHOUT_SEPARATION = [".", "?", "!", ",", ";", ":", ")", "]"
 // all special chars, no distinction necessary for building the model
 const SPECIAL_CHARS = SPECIAL_CHARS_WITH_SEPARATION.concat(SPECIAL_CHARS_WITHOUT_SEPARATION)
 
-let dictionary;
 let model;
+let dictionary;
+let buildModelFinished = false;
 
 let startTime;
 let elapsedTime;
@@ -23,19 +24,32 @@ function buildModel() {
     }
     const reader = new FileReader();
     reader.onload = () => {
-        const text = reader.result;
-        startTime = performance.now();
-        const tokens = preProcessText(text);
-        elapsedTime = performance.now() - startTime;
-        console.log("Pre-processing: " + elapsedTime + " ms");
-        console.log("Training text tokens length: " + tokens.length);
-        model = new NGramModel(ORDER);
-        startTime = performance.now();
-        model.buildModelFromTokens(tokens);
-        elapsedTime = performance.now() - startTime;
-        console.log("Build model: " + elapsedTime + " ms");
+        // setTimeout to make call non-blocking
+        setTimeout(() => {
+            buildModelFromText(reader.result);
+        }, 100);
     }
     reader.readAsText(files[0]);
+}
+
+function buildModelFromText(text) {
+    buildModelFinished = false;
+
+    // pre-process text
+    startTime = performance.now();
+    const tokens = preProcessText(text);
+    elapsedTime = performance.now() - startTime;
+    console.log("Pre-processing: " + elapsedTime + " ms");
+    console.log("Training text tokens length: " + tokens.length);
+
+    // build model
+    model = new NGramModel(ORDER);
+    startTime = performance.now();
+    model.buildModelFromTokens(tokens);
+    elapsedTime = performance.now() - startTime;
+    console.log("Build model: " + elapsedTime + " ms");
+
+    buildModelFinished = true;
 }
 
 function preProcessText(text) {
@@ -105,7 +119,7 @@ function convertTokensFromStringToID(tokens) {
 }
 
 function generateText() {
-    if (!model) {
+    if (!buildModelFinished) {
         alert("You need to build the model first!");
         return;
     }
@@ -124,17 +138,29 @@ function generateText() {
         return;
     }
 
+    // setTimeout to make call non-blocking
+    setTimeout(() => {
+        generateTextFromStartHistory(startHistory, length);
+    }, 100);
+}
+
+function generateTextFromStartHistory(startHistory, length) {
     const startHistoryAsIDs = convertTokensFromStringToID(startHistory);
 
+    // generate tokens
     startTime = performance.now();
     const tokensAsIDs = model.generateTokens(startHistoryAsIDs, length);
     elapsedTime = performance.now() - startTime;
     console.log("Generate tokens: " + elapsedTime + " ms");
     console.log("Generated tokens length: " + tokensAsIDs.length);
     startTime = performance.now();
+
+    // post-process tokens to get text
     const text = postProcessTokens(tokensAsIDs);
     elapsedTime = performance.now () - startTime;
     console.log("Post-processing: " + elapsedTime + " ms");
+
+    // show text
     document.getElementById("generated-text").innerText = text;
 }
 
