@@ -111,11 +111,15 @@ function buildDictionary(tokens) {
 }
 
 function convertTokensFromStringToID(tokens) {
-    const numbers = new Array(tokens.length);
-    for (let i = 0; i < numbers.length; i++) {
-        numbers[i] = dictionary.getIDOfToken(tokens[i]);
+    const ids = new Array(tokens.length);
+    for (let i = 0; i < ids.length; i++) {
+        const id = dictionary.getIDOfToken(tokens[i]);
+        if (id === undefined) {
+            return undefined;
+        }
+        ids[i] = dictionary.getIDOfToken(tokens[i]);
     }
-    return numbers;
+    return ids;
 }
 
 function generateText() {
@@ -127,35 +131,48 @@ function generateText() {
     const startText = document.getElementById("start-text").value;
     const startHistory = tokenize(startText);
     if (startHistory.length !== 2) {
-        alert("You need to specify a start text of exactly 2 tokens!\n" +
+        alert("Invalid start text!\n" +
+            "It must include exactly 2 tokens.\n" +
             "Punctuation / special characters count separately.");
         return;
     }
 
+    const startHistoryAsIDs = convertTokensFromStringToID(startHistory);
+    if (!isStartHistoryValid(startHistoryAsIDs)) {
+        alert("Invalid start text!\nIt must appear somewhere in the training text.");
+        return;
+    }
+
     const length = document.getElementById("text-length").value;
-    if (!length) {
-        alert("Please specify a valid number for the text length!");
+    if (length === undefined) {
+        alert("Invalid text length!");
         return;
     }
 
     // setTimeout to make call non-blocking
     setTimeout(() => {
-        generateTextFromStartHistory(startHistory, length);
+        generateTextFromStartHistory(startHistoryAsIDs, length);
     }, 100);
 }
 
-function generateTextFromStartHistory(startHistory, length) {
-    const startHistoryAsIDs = convertTokensFromStringToID(startHistory);
+function isStartHistoryValid(startHistory) {
+    if (startHistory === undefined) {
+        return false;
+    }
+    // TODO: better return undefined for consistency
+    return model.findNGramByHistory(startHistory) !== undefined;
+}
 
+function generateTextFromStartHistory(startHistory, length) {
     // generate tokens
     startTime = performance.now();
-    const tokensAsIDs = model.generateTokens(startHistoryAsIDs, length);
+    const tokensAsIDs = model.generateTokens(startHistory, length);
     elapsedTime = performance.now() - startTime;
     console.log("Generate tokens: " + elapsedTime + " ms");
     console.log("Generated tokens length: " + tokensAsIDs.length);
     startTime = performance.now();
 
-    // post-process tokens to get text
+    // post-process tokens to create text
     const text = postProcessTokens(tokensAsIDs);
     elapsedTime = performance.now () - startTime;
     console.log("Post-processing: " + elapsedTime + " ms");

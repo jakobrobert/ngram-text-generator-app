@@ -15,13 +15,12 @@ class NGramModel {
             }
             const prediction = tokens[i + this.order - 1];
 
-            // find corresponding ngram for current history, create if it does not exist
-            const ngramIndex = this.findNGramByHistory(history);
-            if (ngramIndex === -1) {
-                const ngram = new NGram(history, prediction);
-                this.ngrams.push(ngram);
+            // find corresponding ngram for current history to add the prediction
+            // create new one if it does not exist
+            const ngram = this.findNGramByHistory(history);
+            if (ngram === undefined) {
+                this.ngrams.push(new NGram(history, prediction));
             } else {
-                const ngram = this.ngrams[ngramIndex];
                 ngram.addPrediction(prediction);
             }
         }
@@ -38,14 +37,13 @@ class NGramModel {
 
         while (tokens.length < length) {
             // find ngram starting with the current history
-            const ngramIndex = this.findNGramByHistory(currHistory);
-            if (ngramIndex === -1) {
+            const ngram = this.findNGramByHistory(currHistory);
+            if (ngram === undefined) {
                 // ngram with current history not found
                 // may occur if current history only appeared at the end of the training text
-                // or if start history did not appear at all
+                // or if it did not appear at all
                 return tokens;
             }
-            const ngram = this.ngrams[ngramIndex];
 
             // add random prediction to tokens
             const prediction = ngram.getRandomPrediction();
@@ -59,11 +57,11 @@ class NGramModel {
     }
 
     findNGramByHistory(history) {
-        for (let i = 0; i < this.ngrams.length; i++) {
-            if (this.ngrams[i].matchesHistory(history)) {
-                return i;
+        for (const ngram of this.ngrams) {
+            if (ngram.matchesHistory(history)) {
+                return ngram;
             }
         }
-        return -1;
+        return undefined;
     }
 }
