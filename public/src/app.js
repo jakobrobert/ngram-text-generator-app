@@ -50,6 +50,8 @@ function buildModelFromText(text) {
     console.log("Build model: " + elapsedTime + " ms");
 
     buildModelFinished = true;
+
+    console.log(model);
 }
 
 function preProcessText(text) {
