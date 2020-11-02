@@ -55,5 +55,8 @@ async function postData(url, data) {
         },
         body: JSON.stringify(data)
     });
+    if (!response.ok) {
+        throw new Error("Request failed: " +  response.statusText);
+    }
     return response.json();
 }

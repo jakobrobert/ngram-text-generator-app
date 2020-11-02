@@ -161,7 +161,6 @@ function isStartHistoryValid(startHistory) {
     if (startHistory === undefined) {
         return false;
     }
-    // TODO: better return undefined for consistency
     return model.findNGramByHistory(startHistory) !== undefined;
 }
 
