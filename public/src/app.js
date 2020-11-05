@@ -167,8 +167,7 @@ async function generateText() {
         alert("Invalid text length!");
         return;
     }
-
-    length = Number.parseInt(lengthStr);
+    const length = Number.parseInt(lengthStr);
 
     startTime = performance.now();
     const generatedText = await api.generateText(startText, length, model);
