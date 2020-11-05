@@ -144,6 +144,9 @@ async function generateText() {
     }
 
     const startText = document.getElementById("start-text").value;
+
+    // TODO: Remove later
+    /*
     const startHistory = tokenize(startText);
     if (startHistory.length !== 2) {
         alert("Invalid start text!\n" +
@@ -152,8 +155,6 @@ async function generateText() {
         return;
     }
 
-    // TODO: Remove later
-    /*
     const startHistoryAsIDs = convertTokensFromStringToID(startHistory);
     if (!isStartHistoryValid(startHistoryAsIDs)) {
         alert("Invalid start text!\nIt must appear somewhere in the training text.");

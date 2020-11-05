@@ -12,11 +12,11 @@ class APIClient {
         return await this.postData(url, data);
     }
 
-    async generateText(startText, textLength, model) {
+    async generateText(startText, length, model) {
         const url = this.baseURL + "/generate-text";
         const data = {
             start_text: startText,
-            text_length: textLength,
+            length: length,
             model: model
         };
         return await this.postData(url, data);
