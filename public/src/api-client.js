@@ -1,7 +1,6 @@
 class APIClient {
     constructor(baseURL) {
         this.baseURL = baseURL;
-        this.model = undefined;
     }
 
     async buildModel(order, trainingText) {

@@ -1,5 +1,7 @@
 const ORDER = 3;
 
+const BASE_URL = "https://jack0042.uber.space/ngram-text-generator-api";
+
 // special chars which are concatenated to the previous with a separation by space
 const SPECIAL_CHARS_WITH_SEPARATION = ["(", "[", "{", "\""];
 
@@ -16,6 +18,12 @@ let buildModelFinished = false;
 let startTime;
 let elapsedTime;
 
+let api;
+
+function init() {
+    api = new APIClient(BASE_URL);
+}
+
 function buildModel() {
     const files = document.getElementById("training-text-file").files;
     if (files.length === 0) {
@@ -23,16 +31,21 @@ function buildModel() {
         return;
     }
     const reader = new FileReader();
-    reader.onload = () => {
-        // setTimeout to make call non-blocking
-        setTimeout(() => {
-            buildModelFromText(reader.result);
-        }, 100);
+    reader.onload = async () => {
+        const text = reader.result;
+        buildModelFinished = false;
+        startTime = performance.now();
+        const model = await api.buildModel(ORDER, text);
+        buildModelFinished = true;
+        elapsedTime = performance.now() - startTime;
+        console.log("Build model: " + elapsedTime + " ms");
+        console.log(model);
     }
     reader.readAsText(files[0]);
 }
 
-function buildModelFromText(text) {
+// TODO: Remove old code later
+async function buildModelFromText(text) {
     buildModelFinished = false;
 
     // pre-process text
