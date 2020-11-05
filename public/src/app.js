@@ -24,7 +24,7 @@ function init() {
     api = new APIClient(BASE_URL);
 }
 
-function buildModel() {
+async function buildModel() {
     const files = document.getElementById("training-text-file").files;
     if (files.length === 0) {
         alert("You need to choose a text file!");
@@ -35,7 +35,7 @@ function buildModel() {
         const text = reader.result;
         buildModelFinished = false;
         startTime = performance.now();
-        const model = await api.buildModel(ORDER, text);
+        model = await api.buildModel(ORDER, text);
         buildModelFinished = true;
         elapsedTime = performance.now() - startTime;
         console.log("Build model: " + elapsedTime + " ms");
@@ -44,7 +44,7 @@ function buildModel() {
     reader.readAsText(files[0]);
 }
 
-// TODO: Remove old code later
+// TODO: Remove later
 async function buildModelFromText(text) {
     buildModelFinished = false;
 
@@ -137,7 +137,7 @@ function convertTokensFromStringToID(tokens) {
     return ids;
 }
 
-function generateText() {
+async function generateText() {
     if (!buildModelFinished) {
         alert("You need to build the model first!");
         return;
@@ -152,11 +152,14 @@ function generateText() {
         return;
     }
 
+    // TODO: Remove later
+    /*
     const startHistoryAsIDs = convertTokensFromStringToID(startHistory);
     if (!isStartHistoryValid(startHistoryAsIDs)) {
         alert("Invalid start text!\nIt must appear somewhere in the training text.");
         return;
     }
+     */
 
     const length = document.getElementById("text-length").value;
     if (length === undefined) {
@@ -164,10 +167,11 @@ function generateText() {
         return;
     }
 
-    // setTimeout to make call non-blocking
-    setTimeout(() => {
-        generateTextFromStartHistory(startHistoryAsIDs, length);
-    }, 100);
+    startTime = performance.now();
+    const generatedText = await api.generateText(startText, length, model);
+    elapsedTime = performance.now() - startTime;
+    console.log("Generate text: " + elapsedTime + " ms");
+    console.log(generatedText);
 }
 
 function isStartHistoryValid(startHistory) {
@@ -177,6 +181,7 @@ function isStartHistoryValid(startHistory) {
     return model.findNGramByHistory(startHistory) !== undefined;
 }
 
+// TODO: Remove later
 function generateTextFromStartHistory(startHistory, length) {
     // generate tokens
     startTime = performance.now();
