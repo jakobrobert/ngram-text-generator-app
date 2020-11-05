@@ -162,11 +162,13 @@ async function generateText() {
     }
      */
 
-    const length = document.getElementById("text-length").value;
-    if (length === undefined) {
+    const lengthStr = document.getElementById("text-length").value;
+    if (lengthStr === undefined) {
         alert("Invalid text length!");
         return;
     }
+
+    length = Number.parseInt(lengthStr);
 
     startTime = performance.now();
     const generatedText = await api.generateText(startText, length, model);
