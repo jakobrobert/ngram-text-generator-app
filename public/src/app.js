@@ -35,11 +35,13 @@ async function buildModel() {
         const text = reader.result;
         buildModelFinished = false;
         startTime = performance.now();
-        model = await api.buildModel(ORDER, text);
-        buildModelFinished = true;
+        const response = await api.buildModel(ORDER, text);
         elapsedTime = performance.now() - startTime;
         console.log("Build model: " + elapsedTime + " ms");
-        console.log(model);
+        model = response.model;
+        dictionary = response.dictionary;
+        buildModelFinished = true;
+        console.log("response", response);
     }
     reader.readAsText(files[0]);
 }
@@ -170,10 +172,10 @@ async function generateText() {
     const length = Number.parseInt(lengthStr);
 
     startTime = performance.now();
-    const generatedText = await api.generateText(startText, length, model);
+    const response = await api.generateText(startText, length, model, dictionary);
     elapsedTime = performance.now() - startTime;
     console.log("Generate text: " + elapsedTime + " ms");
-    console.log(generatedText);
+    console.log("response", response);
 }
 
 function isStartHistoryValid(startHistory) {
