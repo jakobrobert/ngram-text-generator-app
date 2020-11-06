@@ -41,7 +41,6 @@ async function buildModel() {
         model = response.model;
         dictionary = response.dictionary;
         buildModelFinished = true;
-        console.log("response", response);
     }
     reader.readAsText(files[0]);
 }
@@ -175,7 +174,9 @@ async function generateText() {
     const response = await api.generateText(startText, length, model, dictionary);
     elapsedTime = performance.now() - startTime;
     console.log("Generate text: " + elapsedTime + " ms");
-    console.log("response", response);
+
+    // show text
+    document.getElementById("generated-text").innerText = response.text;
 }
 
 function isStartHistoryValid(startHistory) {
