@@ -6,8 +6,8 @@ class APIClient {
     async buildModel(order, trainingText) {
         const url = this.baseURL + "/build-model";
         const data = {
-            order: order,
-            training_text: trainingText
+            "order": order,
+            "training_text": trainingText
         };
         return await this.postData(url, data);
     }
@@ -15,10 +15,10 @@ class APIClient {
     async generateText(startText, length, model, dictionary) {
         const url = this.baseURL + "/generate-text";
         const data = {
-            start_text: startText,
-            length: length,
-            model: model,
-            dictionary: dictionary
+            "start_text": startText,
+            "length": length,
+            "model": model,
+            "dictionary": dictionary
         };
         return await this.postData(url, data);
     }

@@ -38,8 +38,9 @@ async function buildModel() {
         const response = await api.buildModel(ORDER, text);
         elapsedTime = performance.now() - startTime;
         console.log("Build model: " + elapsedTime + " ms");
-        model = response.model;
-        dictionary = response.dictionary;
+        console.log("Training text token count: " + response["token_count"]);
+        model = response["model"];
+        dictionary = response["dictionary"];
         buildModelFinished = true;
     }
     reader.readAsText(files[0]);
@@ -174,9 +175,10 @@ async function generateText() {
     const response = await api.generateText(startText, length, model, dictionary);
     elapsedTime = performance.now() - startTime;
     console.log("Generate text: " + elapsedTime + " ms");
+    console.log("Generated text token count: " + response["token_count"]);
 
     // show text
-    document.getElementById("generated-text").innerText = response.text;
+    document.getElementById("generated-text").innerText = response["text"];
 }
 
 function isStartHistoryValid(startHistory) {
