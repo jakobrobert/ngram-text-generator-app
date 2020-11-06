@@ -5,7 +5,7 @@
     <title>N-Gram Text Generator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
+<body onload="init()">
     <div>
         <label for="training-text-file">Import training text:</label>
         <input type="file" id="training-text-file" accept="text/plain">
@@ -25,10 +25,8 @@
     <div>
         <p id="generated-text"></p>
     </div>
-    <script src="src/dictionary.js"></script>
-    <script src="src/n-gram-prediction.js"></script>
-    <script src="src/n-gram.js"></script>
-    <script src="src/n-gram-model.js"></script>
+
     <script src="src/app.js"></script>
+    <script src="src/api-client.js"></script>
 </body>
 </html>
