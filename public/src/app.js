@@ -11,23 +11,31 @@ function init() {
 }
 
 async function buildModel() {
+    buildModelFinished = false;
+
     const files = document.getElementById("training-text-file").files;
     if (files.length === 0) {
         alert("You need to choose a text file!");
         return;
     }
+
+    const statusLabel = document.getElementById("build-model-status");
+    statusLabel.textContent = "Processing..."
+
     const reader = new FileReader();
     reader.onload = async () => {
         const text = reader.result;
-        buildModelFinished = false;
         const startTime = performance.now();
         const response = await api.buildModel(MODEL_ORDER, text);
         const elapsedTime = performance.now() - startTime;
-        console.log("Build model: " + elapsedTime + " ms");
-        console.log("Training text token count: " + response["token_count"]);
         model = response["model"];
         dictionary = response["dictionary"];
         buildModelFinished = true;
+
+        statusLabel.textContent = "Finished!"
+
+        console.log("Build model: " + elapsedTime + " ms");
+        console.log("Training text token count: " + response["token_count"]);
     }
     reader.readAsText(files[0]);
 }
@@ -50,6 +58,9 @@ async function generateText() {
         startText = undefined;
     }
 
+    const statusLabel = document.getElementById("generate-text-status");
+    statusLabel.textContent = "Processing..."
+
     const startTime = performance.now();
     const response = await api.generateText(model, dictionary, length, startText);
     const elapsedTime = performance.now() - startTime;
@@ -57,4 +68,6 @@ async function generateText() {
     console.log("Generated text token count: " + response["token_count"]);
 
     document.getElementById("generated-text").innerText = response["text"];
+
+    statusLabel.textContent = "Finished!"
 }
