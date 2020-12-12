@@ -38,8 +38,6 @@ async function generateText() {
         return;
     }
 
-    const startText = document.getElementById("start-text").value;
-
     const lengthStr = document.getElementById("text-length").value;
     if (lengthStr === undefined) {
         alert("Invalid text length!");
@@ -47,8 +45,13 @@ async function generateText() {
     }
     const length = Number.parseInt(lengthStr);
 
+    let startText = document.getElementById("start-text").value;
+    if (startText === "") {
+        startText = undefined;
+    }
+
     const startTime = performance.now();
-    const response = await api.generateText(startText, length, model, dictionary);
+    const response = await api.generateText(model, dictionary, length, startText);
     const elapsedTime = performance.now() - startTime;
     console.log("Generate text: " + elapsedTime + " ms");
     console.log("Generated text token count: " + response["token_count"]);
