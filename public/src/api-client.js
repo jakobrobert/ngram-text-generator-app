@@ -12,11 +12,10 @@ class APIClient {
         return await this.postData(url, data);
     }
 
-    async generateText(model, dictionary, length, startText) {
+    async generateText(modelID, length, startText) {
         const url = this.baseURL + "/generate-text";
         const data = {
-            "model": model,
-            "dictionary": dictionary,
+            "model_id": modelID,
             "length": length
         };
         if (startText) {
@@ -35,7 +34,9 @@ class APIClient {
             body: JSON.stringify(data)
         });
         if (!response.ok) {
-            throw new Error("Request failed: " +  response.statusText);
+            const message = "Request failed: " +  response.statusText;
+            alert(message);
+            throw new Error(message);
         }
         return response.json();
     }
