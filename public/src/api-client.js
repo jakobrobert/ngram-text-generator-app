@@ -9,7 +9,8 @@ class APIClient {
             "order": order,
             "training_text": trainingText
         };
-        return await this.postData(url, data);
+        const response = await this.postData(url, data);
+        return response["model_id"];
     }
 
     async generateText(modelID, length, startText) {
@@ -22,7 +23,8 @@ class APIClient {
             // start text is optional
             data["start_text"] = startText;
         }
-        return await this.postData(url, data);
+        const response = await this.postData(url, data);
+        return response["text"];
     }
 
     async postData(url, data) {

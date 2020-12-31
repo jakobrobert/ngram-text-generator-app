@@ -25,9 +25,8 @@ async function buildModel() {
     reader.onload = async () => {
         const text = reader.result;
         const startTime = performance.now();
-        const response = await api.buildModel(MODEL_ORDER, text);
+        modelID = await api.buildModel(MODEL_ORDER, text);
         const elapsedTime = performance.now() - startTime;
-        modelID = response["model_id"];
         buildModelFinished = true;
         statusLabel.textContent = "Finished!"
         console.log("Build model: " + elapsedTime + " ms");
@@ -57,11 +56,11 @@ async function generateText() {
     statusLabel.textContent = "Processing..."
 
     const startTime = performance.now();
-    const response = await api.generateText(modelID, length, startText);
+    const generatedText = await api.generateText(modelID, length, startText);
     const elapsedTime = performance.now() - startTime;
     console.log("Generate text: " + elapsedTime + " ms");
 
-    document.getElementById("generated-text").innerText = response["text"];
+    document.getElementById("generated-text").innerText = generatedText;
 
     statusLabel.textContent = "Finished!"
 }
