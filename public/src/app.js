@@ -2,8 +2,7 @@ const BASE_URL = "https://jack0042.uber.space/ngram-text-generator-api";
 const MODEL_ORDER = 3;
 
 let api;
-let model;
-let dictionary;
+let modelID;
 let buildModelFinished = false;
 
 function init() {
@@ -26,16 +25,11 @@ async function buildModel() {
     reader.onload = async () => {
         const text = reader.result;
         const startTime = performance.now();
-        const response = await api.buildModel(MODEL_ORDER, text);
+        modelID = await api.buildModel(MODEL_ORDER, text);
         const elapsedTime = performance.now() - startTime;
-        model = response["model"];
-        dictionary = response["dictionary"];
         buildModelFinished = true;
-
         statusLabel.textContent = "Finished!"
-
         console.log("Build model: " + elapsedTime + " ms");
-        console.log("Training text token count: " + response["token_count"]);
     }
     reader.readAsText(files[0]);
 }
@@ -62,12 +56,11 @@ async function generateText() {
     statusLabel.textContent = "Processing..."
 
     const startTime = performance.now();
-    const response = await api.generateText(model, dictionary, length, startText);
+    const generatedText = await api.generateText(modelID, length, startText);
     const elapsedTime = performance.now() - startTime;
     console.log("Generate text: " + elapsedTime + " ms");
-    console.log("Generated text token count: " + response["token_count"]);
 
-    document.getElementById("generated-text").innerText = response["text"];
+    document.getElementById("generated-text").innerText = generatedText;
 
     statusLabel.textContent = "Finished!"
 }
